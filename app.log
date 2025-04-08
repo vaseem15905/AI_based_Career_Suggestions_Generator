@@ -1,46 +1,19 @@
-2025-04-08 21:12:46,244 - __main__ - ERROR - Error loading model assets: invalid load key, '\x03'.
-2025-04-08 21:12:46,246 - __main__ - CRITICAL - Failed to initialize application: invalid load key, '\x03'.
-2025-04-08 21:14:30,546 - __main__ - WARNING - Attempt with encoding latin1 failed: invalid load key, '\x03'.
-2025-04-08 21:14:30,548 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
-2025-04-08 21:14:30,549 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
-2025-04-08 21:14:30,550 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings
-2025-04-08 21:14:38,292 - __main__ - WARNING - Attempt with encoding latin1 failed: invalid load key, '\x03'.
-2025-04-08 21:14:38,295 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
-2025-04-08 21:14:38,296 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
-2025-04-08 21:14:38,298 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings
-2025-04-08 21:23:56,311 - __main__ - WARNING - Attempt with encoding latin1 failed: invalid load key, '\x03'.
-2025-04-08 21:23:56,312 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
-2025-04-08 21:23:56,314 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
-2025-04-08 21:23:56,314 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings
-2025-04-08 21:24:03,464 - __main__ - WARNING - Attempt with encoding latin1 failed: invalid load key, '\x03'.
-2025-04-08 21:24:03,466 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
-2025-04-08 21:24:03,468 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
-2025-04-08 21:24:03,469 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings
-2025-04-08 22:56:43,768 - __main__ - WARNING - Attempt with encoding latin1 failed: invalid load key, '\x03'.
-2025-04-08 22:56:43,769 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
-2025-04-08 22:56:43,769 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
-2025-04-08 22:56:43,770 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings
-2025-04-08 22:56:45,344 - __main__ - WARNING - Attempt with encoding latin1 failed: invalid load key, '\x03'.
-2025-04-08 22:56:45,345 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
-2025-04-08 22:56:45,345 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
-2025-04-08 22:56:45,345 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings
-2025-04-08 22:56:54,039 - __main__ - WARNING - Attempt with encoding latin1 failed: invalid load key, '\x03'.
-2025-04-08 22:56:54,040 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
-2025-04-08 22:56:54,040 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
-2025-04-08 22:56:54,041 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings
-2025-04-08 22:57:09,351 - __main__ - INFO - User admin logged in successfully
-2025-04-08 22:57:09,360 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
-2025-04-08 23:00:07,600 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
-2025-04-08 23:00:08,614 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
-2025-04-08 23:00:09,550 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
-2025-04-08 23:00:24,322 - __main__ - WARNING - Attempt with encoding latin1 failed: invalid load key, '\x03'.
-2025-04-08 23:00:24,322 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
-2025-04-08 23:00:24,323 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
-2025-04-08 23:00:24,323 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings
-2025-04-08 23:20:35,726 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
-2025-04-08 23:20:52,306 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
-2025-04-08 23:20:53,324 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
-2025-04-08 23:29:52,615 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
-2025-04-08 23:29:53,642 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
-2025-04-08 23:29:54,544 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
-2025-04-08 23:30:37,296 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
+2025-04-09 00:15:20,016 - __main__ - ERROR - Model files missing: ['models/decision_tree.pkl', 'models/tfidf_vectorizer.pkl']
+2025-04-09 00:15:20,276 - __main__ - ERROR - Model files missing: ['models/decision_tree.pkl', 'models/tfidf_vectorizer.pkl']
+2025-04-09 00:16:12,831 - __main__ - ERROR - Error loading model: invalid load key, '\x03'.
+2025-04-09 00:16:14,116 - __main__ - ERROR - Error loading model: invalid load key, '\x03'.
+2025-04-09 00:17:47,934 - __main__ - ERROR - Error loading model: invalid load key, '\x03'.
+2025-04-09 00:18:16,498 - __main__ - ERROR - Error loading model: invalid load key, '\x03'.
+2025-04-09 00:24:17,749 - __main__ - ERROR - Error loading model: invalid load key, '\x03'.
+2025-04-09 00:24:18,930 - __main__ - ERROR - Error loading model: invalid load key, '\x03'.
+2025-04-09 00:28:37,011 - __main__ - ERROR - Model files missing: ['models/decision_tree.pkl', 'models/tfidf_vectorizer.pkl']
+2025-04-09 00:28:37,413 - __main__ - ERROR - Model files missing: ['models/decision_tree.pkl', 'models/tfidf_vectorizer.pkl']
+2025-04-09 00:28:56,836 - __main__ - INFO - Model and vectorizer loaded successfully
+2025-04-09 00:28:58,197 - __main__ - INFO - Model and vectorizer loaded successfully
+2025-04-09 00:29:04,370 - __main__ - INFO - User admin logged in successfully
+2025-04-09 00:29:39,174 - __main__ - INFO - Career prediction made for user admin
+2025-04-09 00:29:39,179 - __main__ - ERROR - Prediction error: argument of type 'numpy.int64' is not iterable
+2025-04-09 00:29:51,402 - __main__ - INFO - Career prediction made for user admin
+2025-04-09 00:29:51,404 - __main__ - ERROR - Prediction error: argument of type 'numpy.int64' is not iterable
+2025-04-09 00:30:39,369 - __main__ - INFO - Career prediction made for user admin
+2025-04-09 00:30:39,372 - __main__ - ERROR - Prediction error: argument of type 'numpy.int64' is not iterable

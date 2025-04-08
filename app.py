@@ -281,7 +281,7 @@ def career_suggestion():
 
         try:
             user_vector = vectorizer.transform([skills])
-            predicted_career = model.predict(user_vector)[0]
+            predicted_career = model.predict(user_vector[0])
             logger.info(f"Career prediction made for user {session['user']}")
             return render_template("career_suggestion.html", career=predicted_career)
         except Exception as e:

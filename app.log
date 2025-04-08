@@ -16,3 +16,31 @@
 2025-04-08 21:24:03,466 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
 2025-04-08 21:24:03,468 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
 2025-04-08 21:24:03,469 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings
+2025-04-08 22:56:43,768 - __main__ - WARNING - Attempt with encoding latin1 failed: invalid load key, '\x03'.
+2025-04-08 22:56:43,769 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
+2025-04-08 22:56:43,769 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
+2025-04-08 22:56:43,770 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings
+2025-04-08 22:56:45,344 - __main__ - WARNING - Attempt with encoding latin1 failed: invalid load key, '\x03'.
+2025-04-08 22:56:45,345 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
+2025-04-08 22:56:45,345 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
+2025-04-08 22:56:45,345 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings
+2025-04-08 22:56:54,039 - __main__ - WARNING - Attempt with encoding latin1 failed: invalid load key, '\x03'.
+2025-04-08 22:56:54,040 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
+2025-04-08 22:56:54,040 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
+2025-04-08 22:56:54,041 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings
+2025-04-08 22:57:09,351 - __main__ - INFO - User admin logged in successfully
+2025-04-08 22:57:09,360 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
+2025-04-08 23:00:07,600 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
+2025-04-08 23:00:08,614 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
+2025-04-08 23:00:09,550 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
+2025-04-08 23:00:24,322 - __main__ - WARNING - Attempt with encoding latin1 failed: invalid load key, '\x03'.
+2025-04-08 23:00:24,322 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
+2025-04-08 23:00:24,323 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
+2025-04-08 23:00:24,323 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings
+2025-04-08 23:20:35,726 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
+2025-04-08 23:20:52,306 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
+2025-04-08 23:20:53,324 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
+2025-04-08 23:29:52,615 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
+2025-04-08 23:29:53,642 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
+2025-04-08 23:29:54,544 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable
+2025-04-08 23:30:37,296 - __main__ - ERROR - Model or vectorizer not loaded - prediction unavailable

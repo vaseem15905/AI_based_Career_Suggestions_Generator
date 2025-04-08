@@ -1,178 +1,150 @@
-# from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-# import joblib
-# import logging
-# from flask_cors import CORS
-
-# app = Flask(__name__, static_folder='static', template_folder='templates')
-# CORS(app)
-
-# # Secret key for session management
-# app.secret_key = "your_secret_key"
-
-# logging.basicConfig(level=logging.INFO)
-
-# # Dummy user database (Replace with a real database later)
-# users = {"admin": "1234", "naveen": "password"}
-
-# # Load Model and Vectorizer
-# MODEL_PATH = r"C:\skill.AI\model\decision_tree.pkl"
-# VECTORIZER_PATH = r"C:\skill.AI\model\tfidf_vectorizer.pkl"
-
-# try:
-#     model = joblib.load(MODEL_PATH)
-#     vectorizer = joblib.load(VECTORIZER_PATH)
-#     logging.info("✅ Model and vectorizer loaded successfully!")
-# except FileNotFoundError as e:
-#     logging.error(f"❌ File not found: {e}")
-# except Exception as e:
-#     logging.error(f"❌ Error loading model or vectorizer: {e}")
-
-# # ======== Routes =========
-
-# @app.route('/')
-# def home():
-#     if 'user' in session:
-#         return redirect(url_for('data_demo'))  # Redirect if already logged in
-#     return render_template('login.html')
-
-# @app.route('/login', methods=['POST'])
-# def login():
-#     username = request.form.get('username')
-#     password = request.form.get('password')
-
-#     logging.info(f"Login attempt with username: {username}")
-
-#     if username in users and users[username] == password:
-#         session['user'] = username  # Store user in session
-#         logging.info(f"User {username} logged in successfully.")
-#         return redirect(url_for('data_demo'))  # Redirect to data_demo.html
-#     else:
-#         logging.warning("Invalid login attempt.")
-#         return render_template('login.html', error="Invalid username or password")
-
-# @app.route('/data_demo')
-# def data_demo():
-#     if 'user' not in session:
-#         logging.warning("Unauthorized access attempt to data_demo.")
-#         return redirect(url_for('home'))  # Redirect to login if not logged in
-#     logging.info(f"Rendering data_demo.html for user: {session['user']}")
-#     return render_template('data_demo.html')  # Render the data_demo.html page
-
-# @app.route('/logout')
-# def logout():
-#     session.pop('user', None)  # Remove user from session
-#     logging.info("User logged out.")
-#     return redirect(url_for('home'))  # Redirect to login page
-
-# @app.route('/career_suggestion')
-# def career_suggestion():
-#     if 'user' not in session:
-#         logging.warning("Unauthorized access attempt to career_suggestion.")
-#         return redirect(url_for('home'))  # Redirect to login if not logged in
-#     return render_template('career_suggestion.html')  # Render the career_suggestion.html page
-
-# @app.route('/career_results')
-# def career_results():
-#     return render_template('career_results.html')
-
-# # ======== API Endpoint for Model Prediction =========
-# @app.route('/evaluate', methods=['POST'])
-# def evaluate():
-#     try:
-#         data = request.get_json()
-#         answers = data.get('answers', [])
-
-#         if not answers or len(answers) != 5:
-#             logging.warning("Invalid number of answers received.")
-#             return jsonify({'error': 'Invalid number of answers. Expected 5 answers.'}), 400
-
-#         input_vector = vectorizer.transform(answers)
-#         prediction = model.predict(input_vector)[0]
-
-#         skill_mapping = {0: 'Beginner', 1: 'Intermediate', 2: 'Expert'}
-#         skill_level = skill_mapping.get(prediction, 'Unknown')
-
-#         logging.info(f"Prediction: {skill_level}")
-#         return jsonify({'skill_level': skill_level})
-    
-#     except Exception as e:
-#         logging.error(f"Error in evaluation: {e}")
-#         return jsonify({'error': 'An unexpected error occurred. Please try again later.'}), 500
-
-# # ======== Global Error Handler =========
-# @app.errorhandler(Exception)
-# def handle_exception(e):
-#     logging.error(f"Unhandled Error: {e}")
-#     return jsonify({'error': 'An unexpected error occurred. Please try again later.'}), 500
-
-# # ======== Run the Application =========
-# if __name__ == '__main__':
-#     app.run(debug=True)
-
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import pickle
 import os
+import logging
+from logging.handlers import RotatingFileHandler
 
+# Initialize Flask app
 app = Flask(__name__)
-app.secret_key = "your_secret_key"  # Required for session management
+app.secret_key = "your_secret_key_here"  # Change this to a strong secret key
 
-# 🔹 Load the trained model and vectorizer
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=1)
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
+# Constants
 MODEL_PATH = "models/decision_tree.pkl"
 VECTORIZER_PATH = "models/tfidf_vectorizer.pkl"
 
-if not os.path.exists(MODEL_PATH) or not os.path.exists(VECTORIZER_PATH):
-    raise FileNotFoundError("❌ Model files are missing! Run train_evaluate_model.py first.")
+# Dummy user credentials (replace with proper authentication in production)
+USER_CREDENTIALS = {"admin": "password123"}
 
-with open(MODEL_PATH, "rb") as model_file:
-    model = pickle.load(model_file)
+def load_model_assets():
+    """Load model and vectorizer with proper error handling"""
+    try:
+        # Verify files exist and are not empty
+        if not all(map(os.path.exists, [MODEL_PATH, VECTORIZER_PATH])):
+            missing = [f for f in [MODEL_PATH, VECTORIZER_PATH] if not os.path.exists(f)]
+            raise FileNotFoundError(f"Model files missing: {missing}")
+            
+        if any(map(lambda f: os.path.getsize(f) == 0, [MODEL_PATH, VECTORIZER_PATH])):
+            empty = [f for f in [MODEL_PATH, VECTORIZER_PATH] if os.path.getsize(f) == 0]
+            raise ValueError(f"Empty model files: {empty}")
 
-with open(VECTORIZER_PATH, "rb") as vectorizer_file:
-    vectorizer = pickle.load(vectorizer_file)
+        # Try different protocols and encodings to load pickle files
+        for encoding in ['latin1', 'utf-8', 'bytes']:
+            try:
+                with open(MODEL_PATH, "rb") as model_file:
+                    model = pickle.load(model_file, encoding=encoding)
+                
+                with open(VECTORIZER_PATH, "rb") as vectorizer_file:
+                    vectorizer = pickle.load(vectorizer_file, encoding=encoding)
+                
+                logger.info("Model and vectorizer loaded successfully")
+                return model, vectorizer
+                
+            except Exception as e:
+                logger.warning(f"Attempt with encoding {encoding} failed: {str(e)}")
+                continue
 
-# 🔹 Dummy user credentials for login
-USER_CREDENTIALS = {"admin": "password123"}  # Modify as needed
+        # If all attempts failed
+        raise RuntimeError("All attempts to load model files failed with different encodings")
+        
+    except Exception as e:
+        logger.error(f"Critical error loading model assets: {str(e)}")
+        # Instead of exiting, we'll set model and vectorizer to None
+        # and check them before making predictions
+        return None, None
 
-# ✅ Index Route: Redirects to login
+# Load model and vectorizer at startup
+model, vectorizer = load_model_assets()
+
 @app.route("/")
 def home():
+    """Redirect to login page"""
     return redirect(url_for("login"))
 
-# ✅ Login Route
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    """Handle user login"""
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-
-        if username in USER_CREDENTIALS and USER_CREDENTIALS[username] == password:
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "").strip()
+        
+        if not username or not password:
+            flash("Both username and password are required", "danger")
+            return render_template("login.html")
+            
+        if USER_CREDENTIALS.get(username) == password:
             session["user"] = username
-            return redirect(url_for("career_suggestion"))
+            logger.info(f"User {username} logged in successfully")
+            next_page = request.args.get("next", url_for("career_suggestion"))
+            return redirect(next_page)
         else:
-            flash("Invalid credentials! Try again.", "danger")
-
+            logger.warning(f"Failed login attempt for username: {username}")
+            flash("Invalid username or password", "danger")
+    
     return render_template("login.html")
 
-# ✅ Career Suggestion Route (Requires Login)
 @app.route("/career_suggestion", methods=["GET", "POST"])
 def career_suggestion():
+    """Handle career suggestions"""
     if "user" not in session:
-        return redirect(url_for("login"))
-
+        logger.warning("Unauthorized access attempt to career_suggestion")
+        flash("Please login first", "warning")
+        return redirect(url_for("login", next=request.url))
+    
+    # Check if model and vectorizer are loaded
+    if model is None or vectorizer is None:
+        logger.error("Model or vectorizer not loaded - prediction unavailable")
+        flash("Career prediction service is currently unavailable. Please try again later.", "danger")
+        return render_template("career_suggestion.html", career=None)
+    
     if request.method == "POST":
-        user_input = request.form["skills"]
-        user_vector = vectorizer.transform([user_input])
-        predicted_career = model.predict(user_vector)[0]
-
-        return render_template("career_suggestion.html", career=predicted_career)
-
+        skills = request.form.get("skills", "").strip()
+        if not skills:
+            flash("Please enter your skills", "warning")
+            return render_template("career_suggestion.html", career=None)
+        
+        try:
+            user_vector = vectorizer.transform([skills])
+            predicted_career = model.predict(user_vector)[0]
+            logger.info(f"Career prediction made for user {session['user']}")
+            return render_template("career_suggestion.html", career=predicted_career)
+        except Exception as e:
+            logger.error(f"Prediction error: {str(e)}")
+            flash("An error occurred during prediction. Please try again.", "danger")
+    
     return render_template("career_suggestion.html", career=None)
 
-# ✅ Logout Route
 @app.route("/logout")
 def logout():
-    session.pop("user", None)
+    """Handle user logout"""
+    username = session.pop("user", None)
+    if username:
+        logger.info(f"User {username} logged out")
+        flash("You have been logged out successfully", "success")
     return redirect(url_for("login"))
 
-# ✅ Run Flask App
+@app.errorhandler(404)
+def page_not_found(e):
+    """Handle 404 errors"""
+    return render_template("404.html"), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    """Handle 500 errors"""
+    logger.error(f"Server error: {str(e)}")
+    return render_template("500.html"), 500
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Create models directory if it doesn't exist
+    os.makedirs("models", exist_ok=True)
+    
+    # Run the app
+    app.run(host="0.0.0.0", port=5000, debug=True)

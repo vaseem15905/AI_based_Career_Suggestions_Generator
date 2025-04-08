@@ -1,0 +1,18 @@
+2025-04-08 21:12:46,244 - __main__ - ERROR - Error loading model assets: invalid load key, '\x03'.
+2025-04-08 21:12:46,246 - __main__ - CRITICAL - Failed to initialize application: invalid load key, '\x03'.
+2025-04-08 21:14:30,546 - __main__ - WARNING - Attempt with encoding latin1 failed: invalid load key, '\x03'.
+2025-04-08 21:14:30,548 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
+2025-04-08 21:14:30,549 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
+2025-04-08 21:14:30,550 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings
+2025-04-08 21:14:38,292 - __main__ - WARNING - Attempt with encoding latin1 failed: invalid load key, '\x03'.
+2025-04-08 21:14:38,295 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
+2025-04-08 21:14:38,296 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
+2025-04-08 21:14:38,298 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings
+2025-04-08 21:23:56,311 - __main__ - WARNING - Attempt with encoding latin1 failed: invalid load key, '\x03'.
+2025-04-08 21:23:56,312 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
+2025-04-08 21:23:56,314 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
+2025-04-08 21:23:56,314 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings
+2025-04-08 21:24:03,464 - __main__ - WARNING - Attempt with encoding latin1 failed: invalid load key, '\x03'.
+2025-04-08 21:24:03,466 - __main__ - WARNING - Attempt with encoding utf-8 failed: invalid load key, '\x03'.
+2025-04-08 21:24:03,468 - __main__ - WARNING - Attempt with encoding bytes failed: invalid load key, '\x03'.
+2025-04-08 21:24:03,469 - __main__ - ERROR - Critical error loading model assets: All attempts to load model files failed with different encodings

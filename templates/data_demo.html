@@ -1,0 +1,227 @@
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Data | Skill.AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: url('https://source.unsplash.com/1600x900/?technology,ai') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .skill-btn {
+            transition: all 0.3s ease;
+        }
+        .skill-btn.selected {
+            background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
+            color: white;
+            transform: scale(1.05);
+        }
+        .other-skills-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .other-skills-container.expanded {
+            max-height: 300px; /* Adjust based on content */
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-900 bg-opacity-80 p-4">
+    <div class="w-full max-w-4xl p-8 space-y-6 bg-gray-800 bg-opacity-90 rounded-2xl shadow-xl text-white">
+        <div class="text-center">
+            <!-- SVG Logo -->
+            <div class="flex justify-center">
+                <svg width="160" height="60" viewBox="0 0 160 60" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#2563EB"/>
+                            <stop offset="100%" stop-color="#7C3AED"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M20,30 Q30,10 40,30 T60,30 T80,30 T100,30 T120,30" 
+                          stroke="url(#grad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <text x="80" y="45" text-anchor="middle" font-family="Inter, sans-serif" 
+                          font-size="24" font-weight="600" fill="url(#grad)">
+                        Skill.<tspan fill="#7C3AED">AI</tspan>
+                    </text>
+                </svg>
+            </div>
+            <h2 class="mt-2 text-2xl font-semibold">Student Skill Assessment</h2>
+            <p class="text-sm text-gray-400">Please provide your details and select your programming skills</p>
+        </div>
+
+        <!-- Student Details Form -->
+        <form id="studentForm" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Full Name</label>
+                    <input type="text" id="fullName" required 
+                           class="w-full px-4 py-2 text-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Student ID</label>
+                    <input type="text" id="studentId" required 
+                           class="w-full px-4 py-2 text-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Email</label>
+                    <input type="email" id="email" required 
+                           class="w-full px-4 py-2 text-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Class/Department</label>
+                    <input type="text" id="studentClass" required 
+                           class="w-full px-4 py-2 text-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+            </div>
+
+            <!-- Programming Skills Section -->
+            <div class="mt-6">
+                <h3 class="text-lg font-medium mb-3">Core Programming Skills</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <!-- Core Programming Language Buttons -->
+                    <button type="button" onclick="toggleSkill(this)" class="skill-btn py-2 px-3 bg-gray-700 rounded-lg hover:bg-gray-600">
+                        C
+                    </button>
+                    <button type="button" onclick="toggleSkill(this)" class="skill-btn py-2 px-3 bg-gray-700 rounded-lg hover:bg-gray-600">
+                        C++
+                    </button>
+                    <button type="button" onclick="toggleSkill(this)" class="skill-btn py-2 px-3 bg-gray-700 rounded-lg hover:bg-gray-600">
+                        Python
+                    </button>
+                    <button type="button" onclick="toggleSkill(this)" class="skill-btn py-2 px-3 bg-gray-700 rounded-lg hover:bg-gray-600">
+                        Web Development
+                    </button>
+                </div>
+
+                <!-- Other Skills Toggle -->
+                <button type="button" onclick="toggleOtherSkills()" id="otherSkillsBtn" 
+                        class="mt-4 w-full py-2 px-3 bg-gray-700 rounded-lg hover:bg-gray-600 flex items-center justify-between">
+                    <span>Other Skills</span>
+                    <svg id="otherSkillsArrow" class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+
+                <!-- Other Skills Container (Hidden by default) -->
+                <div id="otherSkillsContainer" class="other-skills-container mt-2">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
+                        <button type="button" onclick="toggleSkill(this)" class="skill-btn py-2 px-3 bg-gray-700 rounded-lg hover:bg-gray-600">
+                            Java
+                        </button>
+                        <button type="button" onclick="toggleSkill(this)" class="skill-btn py-2 px-3 bg-gray-700 rounded-lg hover:bg-gray-600">
+                            JavaScript
+                        </button>
+                        <button type="button" onclick="toggleSkill(this)" class="skill-btn py-2 px-3 bg-gray-700 rounded-lg hover:bg-gray-600">
+                            SQL
+                        </button>
+                        <button type="button" onclick="toggleSkill(this)" class="skill-btn py-2 px-3 bg-gray-700 rounded-lg hover:bg-gray-600">
+                            React
+                        </button>
+                        <button type="button" onclick="toggleSkill(this)" class="skill-btn py-2 px-3 bg-gray-700 rounded-lg hover:bg-gray-600">
+                            Node.js
+                        </button>
+                        <button type="button" onclick="toggleSkill(this)" class="skill-btn py-2 px-3 bg-gray-700 rounded-lg hover:bg-gray-600">
+                            Machine Learning
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-4">
+                <button type="button" onclick="submitStudentData()" 
+                        class="w-full py-3 text-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-800 transition-all duration-300">
+                    Submit Assessment
+                </button>
+            </div>
+        </form>
+        <button onclick="window.location.href='/career_suggestion'" 
+                class="py-3 px-6 text-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-800 transition-all duration-300">
+            Next
+        </button>
+    </div>
+
+    <script>
+        // Toggle skill selection
+        function toggleSkill(button) {
+            button.classList.toggle('selected');
+        }
+
+        // Toggle other skills visibility
+        function toggleOtherSkills() {
+            const container = document.getElementById('otherSkillsContainer');
+            const arrow = document.getElementById('otherSkillsArrow');
+            container.classList.toggle('expanded');
+            arrow.classList.toggle('rotate-180');
+        }
+
+        // Submit student data
+        function submitStudentData() {
+            // Get form values
+            const studentData = {
+                fullName: document.getElementById('fullName').value,
+                studentId: document.getElementById('studentId').value,
+                email: document.getElementById('email').value,
+                studentClass: document.getElementById('studentClass').value
+            };
+
+            // Get selected skills (both core and other)
+            const selectedSkills = [];
+            document.querySelectorAll('.skill-btn.selected').forEach(btn => {
+                selectedSkills.push(btn.textContent.trim());
+            });
+            studentData.skills = selectedSkills;
+
+            // Validate data
+            if (!studentData.fullName || !studentData.studentId || !studentData.email || !studentData.studentClass) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            if (studentData.skills.length === 0) {
+                alert('Please select at least one skill');
+                return;
+            }
+
+            // In a real app, you would send this to a server
+            console.log('Student Data:', studentData);
+            alert('Assessment submitted successfully!');
+            
+            // Here you would typically redirect or show a success message
+            // window.location.href = 'results.html';
+        }
+    </script>
+</body>
+</html> {% endcomment %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Demo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Career Dataset Preview</h1>
+        <table border="1">
+            <tr>
+                <th>Skills</th>
+                <th>Career</th>
+            </tr>
+            {% for row in data %}
+            <tr>
+                <td>{{ row['skills'] }}</td>
+                <td>{{ row['career'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <a href="/"><button>Back to Home</button></a>
+    </div>
+</body>
+</html>

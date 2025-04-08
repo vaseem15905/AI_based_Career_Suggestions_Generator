@@ -1,0 +1,107 @@
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Results | Skill.AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: url('https://source.unsplash.com/1600x900/?technology,ai') no-repeat center center fixed;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-900 bg-opacity-80 p-4">
+    <div class="w-full max-w-4xl p-8 space-y-6 bg-gray-800 bg-opacity-90 rounded-2xl shadow-xl text-white">
+        <div class="text-center">
+            <!-- SVG Logo -->
+            <div class="flex justify-center">
+                <svg width="160" height="60" viewBox="0 0 160 60" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#2563EB"/>
+                            <stop offset="100%" stop-color="#7C3AED"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M20,30 Q30,10 40,30 T60,30 T80,30 T100,30 T120,30" 
+                          stroke="url(#grad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <text x="80" y="45" text-anchor="middle" font-family="Inter, sans-serif" 
+                          font-size="24" font-weight="600" fill="url(#grad)">
+                        Skill.<tspan fill="#7C3AED">AI</tspan>
+                    </text>
+                </svg>
+            </div>
+            <h2 class="mt-4 text-3xl font-bold">Career Results</h2>
+            <p class="text-sm text-gray-400">Here are your career suggestions and skill-based questions.</p>
+        </div>
+
+        <!-- Career Suggestions Section -->
+        <div class="mt-6">
+            <h3 class="text-lg font-medium mb-3">Career Suggestions</h3>
+            <div class="p-4 bg-gray-700 rounded-lg">
+                {% if careers %}
+                    {% for career in careers %}
+                        <p class="p-2 bg-gray-600 rounded-lg mb-2">{{ career }}</p>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-gray-400">No career suggestions available.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Skill-Based Questions Section -->
+        <div class="mt-6">
+            <h3 class="text-lg font-medium mb-3">Skill-Based Questions</h3>
+            <div class="p-4 bg-gray-700 rounded-lg">
+                {% if questions %}
+                    {% for skill, skill_questions in questions.items() %}
+                        <h4 class="text-blue-400 mt-2">{{ skill }}</h4>
+                        {% for question in skill_questions %}
+                            <div class="mt-2">
+                                <p class="text-white">{{ question }}</p>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    <p class="text-gray-400">No questions available.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="flex justify-between mt-6">
+            <button onclick="window.location.href='{{ url_for('data_demo') }}'" 
+                    class="py-3 px-6 text-lg font-semibold text-white bg-gradient-to-r from-red-500 to-red-700 rounded-lg shadow-lg hover:from-red-600 hover:to-red-800 transition-all duration-300">
+                Back
+            </button>
+            <button onclick="window.location.href='{{ url_for('home') }}'" 
+                    class="py-3 px-6 text-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-800 transition-all duration-300">
+                Finish
+            </button>
+        </div>
+
+
+
+</html></body>    </div>    </div>
+</body>
+</html> {% endcomment %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Suggestion Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Your Suggested Career Path</h1>
+        <p><strong>Input:</strong> {{ question }}</p>
+        <p><strong>Recommended Career:</strong> {{ suggested_career }}</p>
+        <a href="/career_suggestion"><button>Try Again</button></a>
+    </div>
+</body>
+</html>

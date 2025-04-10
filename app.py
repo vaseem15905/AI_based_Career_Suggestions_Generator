@@ -23,7 +23,8 @@ VECTORIZER_PATH = "models/tfidf_vectorizer.pkl"
 LABEL_ENCODER_PATH = "models/label_encoder.pkl"
 
 # In-memory storage
-users = {"admin": "password123"}
+users = {"admin": "password123",
+         "user" : "123"}
 student_data = {}
 
 QUESTIONS = {
@@ -68,8 +69,69 @@ QUESTIONS = {
         {"question": "What is a compiler?", "answer": "A compiler translates code from high-level to machine language."},
         {"question": "What is version control?", "answer": "It's a system to track changes in code over time, e.g., Git."},
         {"question": "What is an algorithm?", "answer": "A step-by-step procedure to solve a problem or perform a task."}
-    ]
+    ],
+    "Data Scientist": {
+        "Python": [
+            "Explain the difference between Pandas and NumPy.",
+            "How do you handle large datasets in Python?"
+        ],
+        "Machine Learning": [
+            "What is overfitting in machine learning?",
+            "Can you explain gradient descent?"
+        ]
+    },
+    "Web Developer": {
+        "HTML/CSS": [
+            "What is the purpose of the <div> tag in HTML?",
+            "How do you decide between using classes and IDs in CSS?"
+        ],
+        "JavaScript": [
+            "Explain closures in JavaScript.",
+            "What is the difference between 'let', 'const', and 'var'?"
+        ]
+    },
+    "Software Engineer": {
+        "OOP Concepts": [
+            "Explain encapsulation and inheritance with an example.",
+            "What is a design pattern? Name a few."
+        ],
+        "Java": [
+            "What are the main features of Java?",
+            "What is the difference between JDK, JRE, and JVM?"
+        ]
+    }
 }
+
+feedback = {
+    "Data Scientist": {
+        "Python": [
+            {
+                "index": 1,
+                "question": "Explain the difference between Pandas and NumPy.",
+                "answer": "Pandas is for tabular data, NumPy for numerical computations.",
+                "is_correct": True,
+                "correct_answer": "Pandas is for data analysis, NumPy for numerical operations."
+            },
+            {
+                "index": 2,
+                "question": "How do you handle large datasets in Python?",
+                "answer": "Use Pandas",
+                "is_correct": False,
+                "correct_answer": "Use Dask or PySpark for large datasets."
+            }
+        ],
+        "Machine Learning": [
+            {
+                "index": 1,
+                "question": "What is overfitting in machine learning?",
+                "answer": "When the model fits the training set too well.",
+                "is_correct": True,
+                "correct_answer": "When the model performs well on training data but poorly on unseen data."
+            }
+        ],
+    }
+}
+
 
 
 def load_model():
@@ -147,36 +209,59 @@ def get_questions():
 
 @app.route("/evaluate_answers", methods=["POST"])
 def evaluate_answers():
+    # If the user is not logged in
     if "user" not in session:
         return jsonify({"error": "Unauthorized"}), 401
 
+    # Make sure the machine learning components are loaded
     if not all([model, vectorizer, label_encoder]):
         return jsonify({"error": "Model not loaded"}), 503
 
-    data = request.get_json()
+    # Check for correct content type
+    if not request.is_json:
+        return jsonify({"error": "Unsupported Media Type. Use 'application/json'"}), 415
+
+    # Safely parse JSON from the request
+    try:
+        data = request.get_json()
+    except Exception as e:
+        return jsonify({"error": "Invalid JSON data", "details": str(e)}), 400
+
+    # Variables for evaluation
     evaluations = []
     correct = 0
     total_similarity = 0
 
-    for answer in data["answers"]:
-        vectors = vectorizer.transform([answer["userAnswer"], answer["expectedAnswer"]])
-        similarity = (vectors[0] @ vectors[1].T).toarray()[0][0]
+    # Evaluate each answer submitted
+    for idx, answer in enumerate(data.get("answers", [])):
+        # Transform the user answer and the expected answer using the vectorizer
+        try:
+            vectors = vectorizer.transform([answer["userAnswer"], answer["expectedAnswer"]])
+            similarity = (vectors[0] @ vectors[1].T).toarray()[0][0]  # Cosine similarity
+        except KeyError:  # If a key is missing in the data
+            return jsonify({"error": f"Missing key in answer at index {idx}"}), 400
+
+        # Determine whether the answer is correct based on the similarity score
         is_correct = similarity > 0.7
         evaluations.append({
+            "index": idx + 1,  # Q1, Q2, etc.
             "user_answer": answer["userAnswer"],
             "expected_answer": answer["expectedAnswer"],
             "similarity": float(similarity),
             "is_correct": bool(is_correct)
         })
-        if is_correct:
-            correct += 1
-        total_similarity += similarity
 
+        if is_correct:
+            correct += 1  # Increment correct counter
+        total_similarity += similarity  # Add to total similarity score
+
+    # Calculate average score and skill level
     avg_score = (total_similarity / len(evaluations)) * 100 if evaluations else 0
     skill_level = "Beginner"
     if avg_score > 70: skill_level = "Intermediate"
     if avg_score > 85: skill_level = "Expert"
 
+    # Save results in session for the current user
     if session["user"] not in student_data:
         student_data[session["user"]] = {}
 
@@ -187,6 +272,7 @@ def evaluate_answers():
         "total": len(evaluations)
     }
 
+    # Return JSON data as a response
     return jsonify({
         "evaluations": evaluations,
         "correct_count": correct,
@@ -196,44 +282,80 @@ def evaluate_answers():
     })
 
 
+
+
 @app.route("/career_suggestion", methods=["GET", "POST"])
 def career_suggestion():
     if "user" not in session:
-        return redirect(url_for("login"))
+        # Simulate a login session for testing purposes
+        session["user"] = "admin"  # You can replace this with actual login functionality
+
+    session_user = session["user"]
+
+    # Ensure the user exists in student_data, create a default entry if not
+    if session_user not in student_data:
+        student_data[session_user] = {
+            "skills": [],
+            "results": {}
+        }
 
     if request.method == "POST":
+        # Get user input (skills) from the form
+        skills_input = request.form.get("skills", "")
+        skills = [skill.strip().lower() for skill in skills_input.split(",") if skill.strip()]
+
+        # Update the user's skills
+        student_data[session_user]["skills"] = skills
         return redirect(url_for("career_results"))
 
-    user_data = student_data.get(session["user"], {})
-    return render_template("career_suggestion.html",
-                           skills=user_data.get("skills", []),
-                           results=user_data.get("results"))
+    # For GET request, display the career suggestion page
+    user_data = student_data.get(session_user, {})
+    return render_template(
+        "career_suggestion.html",
+        skills=user_data.get("skills", [])
+    )
 
 
-@app.route("/career_results", methods=["POST"])
+
+@app.route("/career_results", methods=["GET"])
 def career_results():
     if "user" not in session:
         return redirect(url_for("login"))
 
-    skills_input = request.form.get("skills", "")
-    skills = [skill.strip().lower() for skill in skills_input.split(",") if skill.strip()]
+    session_user = session["user"]
+    user_skills = student_data.get(session_user, {}).get("skills", [])
 
+    # Generate career suggestions based on user skills
     suggestions = []
-    if any(skill in ["python", "data", "machine learning"] for skill in skills):
-        suggestions.append("Data Scientist")
-    if any(skill in ["web", "html", "css", "javascript"] for skill in skills):
-        suggestions.append("Web Developer")
-    if any(skill in ["java", "c++", "oop"] for skill in skills):
-        suggestions.append("Software Engineer")
+    skill_suggestions_map = {
+        "Data Scientist": ["python", "data", "machine learning"],
+        "Web Developer": ["web", "html", "css", "javascript"],
+        "Software Engineer": ["java", "c++", "oop"]
+    }
+
+    for career, skill_keywords in skill_suggestions_map.items():
+        if any(skill in skill_keywords for skill in user_skills):
+            suggestions.append(career)
 
     if not suggestions:
         suggestions.append("Explore more to find your interests!")
 
-    return render_template("career_suggestion.html",
-                           suggestions=suggestions,
-                           skills=skills,
-                           results=student_data.get(session["user"], {}).get("results"))
+    # Prepare skill-based questions with indexed questions
+    career_questions = {}
+    for suggestion in suggestions:
+        if suggestion in QUESTIONS:
+            # Enumerate each question for the template
+            career_questions[suggestion] = {
+                skill: [(i, question) for i, question in enumerate(skill_questions)]
+                for skill, skill_questions in QUESTIONS[suggestion].items()
+            }
+
+    return render_template(
+        "career_results.html",
+        careers=suggestions,
+        questions=career_questions
+    )
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=5001)

@@ -7,50 +7,71 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="flex items-center justify-center min-h-screen bg-gray-900 p-4">
-    <div class="w-full max-w-4xl p-8 space-y-6 bg-gray-800 rounded-xl shadow-xl text-white">
-        <h2 class="text-3xl font-bold text-center">Career Results</h2>
-        <p class="text-sm text-gray-400 text-center">Here are your career suggestions and skill-based questions.</p>
+<!-- Container -->
+<div class="w-full max-w-4xl p-8 space-y-6 bg-gray-800 rounded-xl shadow-xl text-white">
+    <h2 class="text-3xl font-bold text-center">Career Results</h2>
+    <p class="text-sm text-gray-400 text-center">Here are your career suggestions and skill-based questions.</p>
 
-        <!-- Career Suggestions Section -->
-        <div class="bg-gray-700 p-6 rounded-lg">
-            <h3 class="text-lg font-semibold">Career Suggestions</h3>
-            {% if careers %}
-                <p class="mt-3 text-lg bg-gray-600 p-3 rounded-lg text-center">{{ careers[0] }}</p>
-            {% else %}
-                <p class="text-gray-400">No career suggestions available.</p>
-            {% endif %}
-        </div>
-
-        <!-- Skill-Based Questions Section -->
-        <form action="{{ url_for('evaluate_answers') }}" method="POST" class="bg-gray-700 p-6 rounded-lg">
-            <h3 class="text-lg font-semibold mb-2">Skill-Based Questions</h3>
-            {% if questions %}
-                {% for skill, skill_questions in questions.items() %}
-                    <div class="mb-4">
-                        <h4 class="mt-4 text-blue-400 font-semibold">{{ skill }}</h4>
-                        {% for idx, question in enumerate(skill_questions) %}
-                            <div class="mt-2">
-                                <label class="block mb-1">{{ question }}</label>
-                                <textarea name="answer_{{ skill }}_{{ idx }}" rows="2" required
-                                          class="w-full p-2 rounded-md bg-gray-600 text-white focus:outline-none"></textarea>
-                                <input type="hidden" name="question_{{ skill }}_{{ idx }}" value="{{ question }}">
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-                <div class="text-right mt-6">
-                    <button type="submit" class="py-2 px-4 bg-green-500 rounded-lg text-white">Submit Answers</button>
-                </div>
-            {% else %}
-                <p class="text-gray-400">No skill-based questions available.</p>
-            {% endif %}
-        </form>
-
-        <!-- Navigation Buttons -->
-        <div class="flex justify-between mt-6">
-            <a href="{{ url_for('career_suggestion') }}" class="py-2 px-4 bg-red-500 rounded-lg text-white">Back</a>
-            <a href="{{ url_for('home') }}" class="py-2 px-4 bg-blue-500 rounded-lg text-white">Finish</a>
-        </div>
+    <!-- Career Suggestions Section -->
+    <div class="bg-gray-700 p-6 rounded-lg">
+        <h3 class="text-lg font-semibold">Career Suggestions</h3>
+        {% if careers %}
+        <ul class="mt-3 space-y-2">
+            {% for career in careers %}
+            <li class="p-3 bg-gray-600 rounded-lg text-center">{{ career }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-gray-400">No career suggestions available.</p>
+        {% endif %}
     </div>
+
+    <!-- Skill-Based Questions Section -->
+    <form action="{{ url_for('evaluate_answers') }}" method="POST" class="bg-gray-700 p-6 rounded-lg">
+        <h3 class="text-lg font-semibold mb-2">Skill-Based Questions</h3>
+
+        {% if questions %}
+        {% for career, skills in questions.items() %}
+        <div class="mb-6">
+            <h4 class="font-semibold text-xl text-blue-400">{{ career }}</h4>
+            {% for skill, skill_questions in skills.items() %}
+            <div class="pt-4">
+                <p class="text-lg font-medium text-gray-300">{{ skill }}</p>
+                <ul class="mt-2 space-y-2">
+                    {% for idx, question in skill_questions %}
+                    <li>
+                        <div class="text-sm">
+                            <label class="block">{{ idx + 1 }}. {{ question }}</label>
+                            <textarea
+                                    name="answer_{{ skill }}_{{ idx }}"
+                                    rows="2"
+                                    required
+                                    class="w-full p-2 mt-1 rounded-md bg-gray-600 text-white focus:outline-none"
+                            ></textarea>
+                            <input type="hidden" name="question_{{ skill }}_{{ idx }}" value="{{ question }}">
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <div class="text-right mt-6">
+            <button type="submit" class="py-2 px-4 bg-green-500 rounded-lg text-white hover:bg-green-600">
+                Submit Answers
+            </button>
+        </div>
+        {% else %}
+        <p class="text-gray-400">No skill-based questions available.</p>
+        {% endif %}
+    </form>
+
+    <!-- Navigation Buttons -->
+    <div class="flex justify-between mt-6">
+        <a href="{{ url_for('career_suggestion') }}" class="py-2 px-4 bg-red-500 rounded-lg text-white hover:bg-red-600">Back</a>
+        <a href="{{ url_for('home') }}" class="py-2 px-4 bg-blue-500 rounded-lg text-white hover:bg-blue-600">Finish</a>
+    </div>
+</div>
 </body>
 </html>

@@ -22,19 +22,29 @@
         </div>
 
         <!-- Skill-Based Questions Section -->
-        <div class="bg-gray-700 p-6 rounded-lg">
-            <h3 class="text-lg font-semibold">Skill-Based Questions</h3>
+        <form action="{{ url_for('evaluate_answers') }}" method="POST" class="bg-gray-700 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-2">Skill-Based Questions</h3>
             {% if questions %}
                 {% for skill, skill_questions in questions.items() %}
-                    <h4 class="mt-4 text-blue-400 font-semibold">{{ skill }}</h4>
-                    {% for question in skill_questions %}
-                        <p class="mt-2">{{ question }}</p>
-                    {% endfor %}
+                    <div class="mb-4">
+                        <h4 class="mt-4 text-blue-400 font-semibold">{{ skill }}</h4>
+                        {% for idx, question in enumerate(skill_questions) %}
+                            <div class="mt-2">
+                                <label class="block mb-1">{{ question }}</label>
+                                <textarea name="answer_{{ skill }}_{{ idx }}" rows="2" required
+                                          class="w-full p-2 rounded-md bg-gray-600 text-white focus:outline-none"></textarea>
+                                <input type="hidden" name="question_{{ skill }}_{{ idx }}" value="{{ question }}">
+                            </div>
+                        {% endfor %}
+                    </div>
                 {% endfor %}
+                <div class="text-right mt-6">
+                    <button type="submit" class="py-2 px-4 bg-green-500 rounded-lg text-white">Submit Answers</button>
+                </div>
             {% else %}
                 <p class="text-gray-400">No skill-based questions available.</p>
             {% endif %}
-        </div>
+        </form>
 
         <!-- Navigation Buttons -->
         <div class="flex justify-between mt-6">

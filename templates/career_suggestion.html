@@ -62,36 +62,55 @@
         </form>
 
         <!-- Career Suggestion Result -->
-        {% if career %}
+        {% if careers %}
         <div class="mt-6 p-4 bg-gray-700 rounded-lg career-result">
-            <h3 class="text-lg font-medium mb-2">Suggested Career Path:</h3>
-            <div class="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white font-bold text-center text-xl">
-                {{ career }}
-            </div>
+            <h3 class="text-lg font-medium mb-2">Suggested Career Paths:</h3>
+            <ul class="space-y-2">
+                {% for career in careers %}
+                    <li class="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white font-bold text-center text-xl">
+                        {{ career }}
+                    </li>
+                {% endfor %}
+            </ul>
             <div class="mt-3 p-3 bg-gray-600 rounded-lg">
                 <h4 class="font-medium mb-1">Recommended Skills to Develop:</h4>
                 <ul class="list-disc list-inside text-sm text-gray-300">
-                    {% if "Data" in career %}
-                        <li>Advanced Python (Pandas, NumPy)</li>
-                        <li>Machine Learning frameworks</li>
-                        <li>Data visualization tools</li>
-                    {% elif "Software" in career %}
-                        <li>System design principles</li>
-                        <li>Algorithms and data structures</li>
-                        <li>Version control (Git)</li>
-                    {% elif "Web" in career %}
-                        <li>Modern JavaScript frameworks</li>
-                        <li>Responsive design techniques</li>
-                        <li>API development</li>
-                    {% else %}
-                        <li>Problem-solving skills</li>
-                        <li>Continuous learning</li>
-                        <li>Domain-specific knowledge</li>
-                    {% endif %}
+                    {% for career in careers %}
+                        {% if "Data" in career %}
+                            <li>Advanced Python (Pandas, NumPy)</li>
+                            <li>Machine Learning frameworks</li>
+                            <li>Data visualization tools</li>
+                        {% elif "Web" in career %}
+                            <li>Modern JavaScript frameworks</li>
+                            <li>Responsive design techniques</li>
+                            <li>API development</li>
+                        {% elif "Software" in career %}
+                            <li>System design principles</li>
+                            <li>Algorithms and data structures</li>
+                            <li>Version control (Git)</li>
+                        {% elif "Cloud" in career %}
+                            <li>Cloud platforms (AWS, Azure)</li>
+                            <li>Containers (Docker, Kubernetes)</li>
+                            <li>Cloud architecture</li>
+                        {% elif "Cybersecurity" in career %}
+                            <li>Network security basics</li>
+                            <li>Ethical hacking tools</li>
+                            <li>Penetration testing</li>
+                        {% endif %}
+                    {% endfor %}
                 </ul>
             </div>
         </div>
         {% endif %}
     </div>
+
+    {% if careers %}
+    <div class="mt-6 text-center">
+        <a href="{{ url_for('generate_resume') }}?career={{ careers[0] }}&skills={{ skills|urlencode }}"
+           class="inline-block py-3 px-6 font-semibold text-white bg-gradient-to-r from-green-500 to-green-700 rounded-lg shadow-lg hover:from-green-600 hover:to-green-800 transition-all duration-300">
+            Generate Resume for {{ careers[0] }}
+        </a>
+    </div>
+    {% endif %}
 </body>
 </html>

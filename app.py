@@ -1,12 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 import joblib
 import os
 import logging
 from logging.handlers import RotatingFileHandler
+import random
 
-# Initialize Flask app
 app = Flask(__name__)
-app.secret_key = "your_secret_key_here"  # Change this to a strong secret key
+app.secret_key = "your_secret_key_here"
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -17,357 +17,223 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-# # Constants
-# MODEL_PATH = "models/decision_tree.pkl"
-# VECTORIZER_PATH = "models/tfidf_vectorizer.pkl"
-# LABEL_ENCODER_PATH= "models/label_encoder.pkl"  # <-- Load the label encoder
-
-# # Dummy user credentials (replace with proper authentication in production)
-# USER_CREDENTIALS = {"admin": "password123"}
-
-# def load_model_assets():
-#     """Load model and vectorizer using joblib with detailed error logging"""
-#     try:
-#         if not all(map(os.path.exists, [MODEL_PATH, VECTORIZER_PATH])):
-#             missing = [f for f in [MODEL_PATH, VECTORIZER_PATH] if not os.path.exists(f)]
-#             logger.error(f"Model files missing: {missing}")
-#             return None, None
-
-#         if any(map(lambda f: os.path.getsize(f) == 0, [MODEL_PATH, VECTORIZER_PATH])):
-#             empty = [f for f in [MODEL_PATH, VECTORIZER_PATH] if os.path.getsize(f) == 0]
-#             logger.error(f"Empty model files: {empty}")
-#             return None, None
-
-#         model = joblib.load(MODEL_PATH)
-#         vectorizer = joblib.load(VECTORIZER_PATH)
-
-#         logger.info("Model and vectorizer loaded successfully")
-#         return model, vectorizer
-
-#     except Exception as e:
-#         logger.error(f"Error loading model: {str(e)}")
-#         return None, None
-
-# # Load model and vectorizer at startup
-# model, vectorizer = load_model_assets()
-# Constants
+# Model paths
 MODEL_PATH = "models/decision_tree.pkl"
 VECTORIZER_PATH = "models/tfidf_vectorizer.pkl"
-LABEL_ENCODER_PATH = "models/label_encoder.pkl"  # <-- Include label encoder
+LABEL_ENCODER_PATH = "models/label_encoder.pkl"
 
-# Dummy user credentials (replace with proper authentication in production)
-USER_CREDENTIALS = {"admin": "password123"}
-def load_model_assets():
-    """Load model, vectorizer, and label encoder"""
+# In-memory storage
+users = {"admin": "password123"}
+student_data = {}
+
+QUESTIONS = {
+    "C": [
+        {"question": "What are pointers in C?", "answer": "Pointers store memory addresses."},
+        {"question": "Explain memory management in C.", "answer": "Memory is allocated dynamically using malloc, free."},
+        {"question": "Explain the difference between C and C++.", "answer": "C++ supports OOP while C is procedural."},
+        {"question": "What is a segmentation fault in C?", "answer": "It occurs when a program tries to access restricted memory."},
+        {"question": "What is a NULL pointer?", "answer": "A pointer that does not point to any memory location."},
+        {"question": "What is the use of 'sizeof' operator in C?", "answer": "It returns the size of a data type or variable."}
+    ],
+    "C++": [
+        {"question": "What is polymorphism in C++?", "answer": "Polymorphism allows functions to take multiple forms."},
+        {"question": "What is a constructor in C++?", "answer": "A constructor initializes objects when they are created."},
+        {"question": "What is operator overloading in C++?", "answer": "It allows you to redefine the meaning of operators."},
+        {"question": "What is a virtual function in C++?", "answer": "A function that can be overridden in a derived class."}
+    ],
+    "Python": [
+        {"question": "What are Python decorators?", "answer": "Decorators modify function behavior without changing code."},
+        {"question": "Explain list comprehensions in Python.", "answer": "List comprehensions allow concise list creation."},
+        {"question": "What is a lambda function?", "answer": "An anonymous function defined using the lambda keyword."},
+        {"question": "What is the difference between 'is' and '==' in Python?", "answer": "'is' checks identity, '==' checks value equality."},
+        {"question": "What are Python's data types?", "answer": "Common types include int, float, str, list, tuple, dict."}
+    ],
+    "Java": [
+        {"question": "What is the difference between an interface and an abstract class in Java?", "answer": "Abstract classes allow method implementation, interfaces do not."},
+        {"question": "What is the JVM?", "answer": "Java Virtual Machine runs Java bytecode on any platform."},
+        {"question": "What is method overloading?", "answer": "Defining multiple methods with the same name but different parameters."},
+        {"question": "What is the purpose of the 'final' keyword in Java?", "answer": "It prevents further modification of variables, methods, or classes."}
+    ],
+    "Web": [
+        {"question": "What is the difference between HTML and HTML5?", "answer": "HTML5 supports modern features like audio, video."},
+        {"question": "What does 'HTTP' stand for?", "answer": "HyperText Transfer Protocol."},
+        {"question": "What is CSS used for?", "answer": "CSS styles the HTML elements visually."},
+        {"question": "What is JavaScript primarily used for?", "answer": "It adds interactivity and dynamic content to websites."},
+        {"question": "What is the purpose of a meta tag in HTML?", "answer": "Meta tags provide metadata like character set or page description."}
+    ],
+    "General": [
+        {"question": "Explain what a variable is in programming.", "answer": "A variable is a named storage location that holds data."},
+        {"question": "Explain REST API principles.", "answer": "REST APIs use HTTP methods to perform CRUD operations on resources."},
+        {"question": "Explain the CAP theorem in distributed systems.", "answer": "CAP states a distributed system can't simultaneously guarantee Consistency, Availability, and Partition tolerance."},
+        {"question": "What is a compiler?", "answer": "A compiler translates code from high-level to machine language."},
+        {"question": "What is version control?", "answer": "It's a system to track changes in code over time, e.g., Git."},
+        {"question": "What is an algorithm?", "answer": "A step-by-step procedure to solve a problem or perform a task."}
+    ]
+}
+
+
+def load_model():
     try:
-        if not all(map(os.path.exists, [MODEL_PATH, VECTORIZER_PATH, LABEL_ENCODER_PATH])):
-            missing = [f for f in [MODEL_PATH, VECTORIZER_PATH, LABEL_ENCODER_PATH] if not os.path.exists(f)]
-            logger.error(f"Model files missing: {missing}")
-            return None, None, None
-
         model = joblib.load(MODEL_PATH)
         vectorizer = joblib.load(VECTORIZER_PATH)
-        label_encoder = joblib.load(LABEL_ENCODER_PATH)  # <-- Load Label Encoder
-
-        logger.info("Model, vectorizer, and label encoder loaded successfully")
+        label_encoder = joblib.load(LABEL_ENCODER_PATH)
         return model, vectorizer, label_encoder
-
     except Exception as e:
-        logger.error(f"Error loading model assets: {str(e)}", exc_info=True)
+        logger.error(f"Error loading model: {str(e)}")
         return None, None, None
 
-# Load assets
-model, vectorizer, label_encoder = load_model_assets()
+
+model, vectorizer, label_encoder = load_model()
+
 
 @app.route("/")
 def home():
-    """Home page route"""
     return render_template("index.html")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    """Handle user login"""
     if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "").strip()
-
+        username = request.form.get("username")
+        password = request.form.get("password")
         if not username or not password:
-            flash("Both username and password are required", "danger")
+            flash("Both fields are required", "danger")
             return render_template("login.html")
 
-        if USER_CREDENTIALS.get(username) == password:
+        if users.get(username) == password:
             session["user"] = username
-            logger.info(f"User {username} logged in successfully")
-            # Changed default redirect from career_suggestion to data_demo
-            next_page = request.args.get("next", url_for("data_demo"))
-            return redirect(next_page)
-        else:
-            logger.warning(f"Failed login attempt for username: {username}")
-            flash("Invalid username or password", "danger")
+            return redirect(url_for("data_demo"))
 
+        flash("Invalid credentials", "danger")
     return render_template("login.html")
+
 
 @app.route("/data_demo")
 def data_demo():
-    """Show dataset preview"""
     if "user" not in session:
-        logger.warning("Unauthorized access attempt to data_demo")
-        flash("Please login first", "warning")
-        return redirect(url_for("login", next=url_for("data_demo")))
-    
-    # Sample data - replace with your actual dataset
-    sample_data = [
-        {"skills": "Python, Data Analysis, Machine Learning", "career": "Data Scientist"},
-        {"skills": "Java, Spring, SQL", "career": "Backend Developer"},
-        {"skills": "JavaScript, HTML, CSS", "career": "Frontend Developer"},
-    ]
-    return render_template("data_demo.html", data=sample_data)
+        return redirect(url_for("login"))
+    return render_template("data_demo.html")
+
+
+@app.route("/get_questions", methods=["POST"])
+def get_questions():
+    if "user" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json()
+    selected_skills = data.get("skills", [])
+
+    student_data[session["user"]] = {
+        "info": {
+            "name": data.get("fullName"),
+            "id": data.get("studentId"),
+            "email": data.get("email"),
+            "class": data.get("studentClass")
+        },
+        "skills": selected_skills
+    }
+
+    gathered_questions = []
+    for skill in selected_skills:
+        if skill in QUESTIONS:
+            gathered_questions.extend(QUESTIONS[skill])
+
+    if not gathered_questions:
+        gathered_questions = QUESTIONS.get("General", [])
+
+    questions = random.sample(gathered_questions, min(4, len(gathered_questions)))
+    return jsonify({"questions": questions, "skills": selected_skills})
+
+
+@app.route("/evaluate_answers", methods=["POST"])
+def evaluate_answers():
+    if "user" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not all([model, vectorizer, label_encoder]):
+        return jsonify({"error": "Model not loaded"}), 503
+
+    data = request.get_json()
+    evaluations = []
+    correct = 0
+    total_similarity = 0
+
+    for answer in data["answers"]:
+        vectors = vectorizer.transform([answer["userAnswer"], answer["expectedAnswer"]])
+        similarity = (vectors[0] @ vectors[1].T).toarray()[0][0]
+        is_correct = similarity > 0.7
+        evaluations.append({
+            "user_answer": answer["userAnswer"],
+            "expected_answer": answer["expectedAnswer"],
+            "similarity": float(similarity),
+            "is_correct": bool(is_correct)
+        })
+        if is_correct:
+            correct += 1
+        total_similarity += similarity
+
+    avg_score = (total_similarity / len(evaluations)) * 100 if evaluations else 0
+    skill_level = "Beginner"
+    if avg_score > 70: skill_level = "Intermediate"
+    if avg_score > 85: skill_level = "Expert"
+
+    if session["user"] not in student_data:
+        student_data[session["user"]] = {}
+
+    student_data[session["user"]]["results"] = {
+        "score": avg_score,
+        "skill_level": skill_level,
+        "correct": correct,
+        "total": len(evaluations)
+    }
+
+    return jsonify({
+        "evaluations": evaluations,
+        "correct_count": correct,
+        "total_questions": len(evaluations),
+        "average_score": avg_score,
+        "skill_level": skill_level
+    })
 
 
 @app.route("/career_suggestion", methods=["GET", "POST"])
 def career_suggestion():
-    """Handle career suggestions based on user's skills."""
     if "user" not in session:
-        flash("Please login first", "warning")
-        return redirect(url_for("login", next=url_for("career_suggestion")))
-
-    # Check if model components are loaded
-    if not all([model, vectorizer, label_encoder]):
-        flash("Career prediction service is currently unavailable. Please try again later.", "danger")
-        return render_template("career_suggestion.html", career=None)
+        return redirect(url_for("login"))
 
     if request.method == "POST":
-        # Get the user's skills input
-        skills = request.form.get("skills", "").strip()
+        return redirect(url_for("career_results"))
 
-        if skills:
-            try:
-                # Example logic: map skills to career paths
-                career_mapping = {
-                    "Python": "Data Scientist",
-                    "JavaScript": "Web Developer",
-                    "Machine Learning": "AI Engineer",
-                    "Software": "Software Engineer",
-                    "Data": "Data Analyst"
-                }
+    user_data = student_data.get(session["user"], {})
+    return render_template("career_suggestion.html",
+                           skills=user_data.get("skills", []),
+                           results=user_data.get("results"))
 
-                # For simplicity, we match keywords from the skills to career paths
-                suggested_career = None
-                for skill in skills.split(","):
-                    skill = skill.strip().lower()
-                    if skill in career_mapping:
-                        suggested_career = career_mapping[skill]
-                        break
 
-                # If no match is found, show a generic suggestion
-                if not suggested_career:
-                    suggested_career = "Software Engineer"
+@app.route("/career_results", methods=["POST"])
+def career_results():
+    if "user" not in session:
+        return redirect(url_for("login"))
 
-                return render_template("career_suggestion.html", career=suggested_career)
+    skills_input = request.form.get("skills", "")
+    skills = [skill.strip().lower() for skill in skills_input.split(",") if skill.strip()]
 
-            except Exception as e:
-                flash(f"An error occurred during prediction: {str(e)}", "danger")
-                return render_template("career_suggestion.html", career=None)
+    suggestions = []
+    if any(skill in ["python", "data", "machine learning"] for skill in skills):
+        suggestions.append("Data Scientist")
+    if any(skill in ["web", "html", "css", "javascript"] for skill in skills):
+        suggestions.append("Web Developer")
+    if any(skill in ["java", "c++", "oop"] for skill in skills):
+        suggestions.append("Software Engineer")
 
-    # Default rendering without career suggestion
-    return render_template("career_suggestion.html", career=None)
+    if not suggestions:
+        suggestions.append("Explore more to find your interests!")
 
+    return render_template("career_suggestion.html",
+                           suggestions=suggestions,
+                           skills=skills,
+                           results=student_data.get(session["user"], {}).get("results"))
 
-
-
-
-
-
-
-
-
-
-
-
-
-# @app.route("/career_suggestion", methods=["GET", "POST"])
-# def career_suggestion():
-#     """Handle career suggestions"""
-#     if "user" not in session:
-#         flash("Please login first", "warning")
-#         return redirect(url_for("login", next=url_for("career_suggestion")))
-
-#     # Check if model components are loaded
-#     if not all([model, vectorizer, label_encoder]):
-#         flash("Career prediction service is currently unavailable. Please try again later.", "danger")
-#         return render_template("career_suggestion.html", career=None)
-
-#     if request.method == "POST":
-#         skills = request.form.get("skills", "").strip()
-#         if not skills:
-#             flash("Please enter your skills", "warning")
-#             return render_template("career_suggestion.html", career=None)
-
-#         try:
-#             logger.info(f"User Input: {skills}")
-
-#             # Transform input
-#             user_vector = vectorizer.transform([skills])
-#             logger.info(f"Vectorized Input Shape: {user_vector.shape}")
-
-#             # Predict career
-#             predicted_label = model.predict(user_vector)[0]
-#             logger.info(f"Predicted Label: {predicted_label}")
-
-#             # Convert label to career name
-#             suggested_career = label_encoder.inverse_transform([predicted_label])[0]
-#             logger.info(f"Suggested Career: {suggested_career}")
-
-#             # Mock skill-based questions for now
-#             skill_questions = {
-#                 "AI": ["What is supervised learning?", "Explain the difference between AI and ML."],
-#                 "Web Development": ["What is the difference between HTML and React?", "Explain REST APIs."],
-#                 "Data Science": ["What is data preprocessing?", "Explain feature engineering."],
-#             }
-
-#             questions = skill_questions.get(suggested_career, ["No questions available."])
-#             print(f"DEBUG - Passing to career_results.html: {suggested_career}, {questions}")  # Debugging
-
-#             return render_template(
-#                 "career_results.html",
-#                 careers=[suggested_career],  # Pass as a list
-#                 questions={suggested_career: questions},  # Format questions properly
-#             )
-
-#         except Exception as e:
-#             import traceback
-#             error_details = traceback.format_exc()
-#             print(f"Error during prediction:\n{error_details}")  # Debug print
-#             flash(f"An error occurred during prediction: {str(e)}", "danger")
-
-#     return render_template("career_suggestion.html", career=None)
-
-
-
-
-
-
-
-# @app.route("/career_suggestion", methods=["GET", "POST"])
-# def career_suggestion():
-#     """Handle career suggestions"""
-#     if "user" not in session:
-#         flash("Please login first", "warning")
-#         return redirect(url_for("login", next=url_for("career_suggestion")))
-
-#     # Check if model components are loaded
-#     if not all([model, vectorizer, label_encoder]):
-#         flash("Career prediction service is currently unavailable. Please try again later.", "danger")
-#         return render_template("career_suggestion.html", career=None)
-
-#     if request.method == "POST":
-#         skills = request.form.get("skills", "").strip()
-#         if not skills:
-#             flash("Please enter your skills", "warning")
-#             return render_template("career_suggestion.html", career=None)
-
-#         try:
-#             logger.info(f"User Input: {skills}")
-
-#             # Transform input
-#             user_vector = vectorizer.transform([skills])
-#             logger.info(f"Vectorized Input Shape: {user_vector.shape}")
-
-#             # Predict career
-#             predicted_label = model.predict(user_vector)[0]
-#             logger.info(f"Predicted Label: {predicted_label}")
-
-#             # Convert label to career name
-#             suggested_career = label_encoder.inverse_transform([predicted_label])[0]
-#             logger.info(f"Suggested Career: {suggested_career}")
-
-#             print(f"DEBUG - Passing to career_results.html: {suggested_career}")  # Debugging
-
-#             return render_template(
-#                 "career_results.html",
-#                 question=skills,
-#                 suggested_career=suggested_career
-#             )
-
-#         except Exception as e:
-#             import traceback
-#             error_details = traceback.format_exc()
-#             print(f"Error during prediction:\n{error_details}")  # Debug print
-#             flash(f"An error occurred during prediction: {str(e)}", "danger")
-
-#     return render_template("career_suggestion.html", career=None)
-
-
-
-
-# @app.route("/career_suggestion", methods=["GET", "POST"])
-# def career_suggestion():
-#     """Handle career suggestions"""
-#     if "user" not in session:
-#         flash("Please login first", "warning")
-#         return redirect(url_for("login", next=url_for("career_suggestion")))
-
-#     # Check if model components are loaded
-#     if not all([model, vectorizer, label_encoder]):
-#         flash("Career prediction service is currently unavailable. Please try again later.", "danger")
-#         return render_template("career_suggestion.html", career=None)
-
-#     if request.method == "POST":
-#         skills = request.form.get("skills", "").strip()
-#         if not skills:
-#             flash("Please enter your skills", "warning")
-#             return render_template("career_suggestion.html", career=None)
-
-#         try:
-#             logger.info(f"User Input: {skills}")
-
-#             # Transform input
-#             user_vector = vectorizer.transform([skills])
-#             logger.info(f"Vectorized Input Shape: {user_vector.shape}")
-
-#             # Predict career
-#             predicted_label = model.predict(user_vector)[0]
-#             logger.info(f"Predicted Label: {predicted_label}")
-
-#             # Convert label to career name
-#             suggested_career = label_encoder.inverse_transform([predicted_label])[0]
-#             logger.info(f"Suggested Career: {suggested_career}")
-
-#             return render_template("career_results.html", question=skills, suggested_career=suggested_career)
-
-#         except Exception as e:
-#             import traceback
-#             error_details = traceback.format_exc()
-#             print(f"Error during prediction:\n{error_details}")  # Debug print
-#             flash(f"An error occurred during prediction: {str(e)}", "danger") 
-#             # Show specific error
-#     return render_template("career_suggestion.html", career=None)
-
-
-
-@app.route("/logout")
-def logout():
-    """Handle user logout"""
-    username = session.pop("user", None)
-    if username:
-        logger.info(f"User {username} logged out")
-        flash("You have been logged out successfully", "success")
-    return redirect(url_for("home"))
-
-@app.errorhandler(404)
-def page_not_found(e):
-    """Handle 404 errors"""
-    return render_template("404.html"), 404
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    """Handle 500 errors"""
-    logger.error(f"Server error: {str(e)}")
-    return render_template("500.html"), 500
 
 if __name__ == "__main__":
-    # Create models directory if it doesn't exist
-    os.makedirs("models", exist_ok=True)
-
-    # Run the app
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True)

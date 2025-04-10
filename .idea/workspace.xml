@@ -5,35 +5,58 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8a2976ab-62b8-43c2-972a-7e086005b5a4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/templates/career_suggestion.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/resume_form.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/resume_output.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.log" beforeDir="false" afterPath="$PROJECT_DIR$/app.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/career_sugession.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/train_evaluate_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model/train_evaluate_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/decision_tree.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/label_encoder.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/tfidf_vectorizer.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/career_results.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/career_results.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/career_suggestion.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/career_suggestion.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/data_demo.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/data_demo.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 6
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="2vSKd5sk9zlVcDICjX5MNPNK95v" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.app.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "D:/Github/AI_based_Career_Suggestions_Generator"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Python.app.executor&quot;: &quot;Run&quot;,
+    &quot;Python.train_evaluate_model.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Github/AI_based_Career_Suggestions_Generator&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Github\AI_based_Career_Suggestions_Generator\models" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

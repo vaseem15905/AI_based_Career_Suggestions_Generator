@@ -138,90 +138,131 @@
                 </button>
             </div>
         </form>
-        <button onclick="window.location.href='/career_suggestion'" 
-                class="py-3 px-6 text-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-800 transition-all duration-300">
-            Next
-        </button>
+        <div id="questionsSection" class="hidden mt-8 p-6 bg-gray-700 rounded-xl">
+            <h3 class="text-xl font-semibold mb-4">Skill Assessment Questions</h3>
+            <div id="questionsContainer" class="space-y-6">
+                <!-- Questions will be dynamically inserted here -->
+            </div>
+            <div class="mt-6">
+                <button id="submitAnswersBtn" onclick="submitAnswers()"
+                        class="w-full py-3 text-lg font-semibold text-white bg-gradient-to-r from-green-500 to-green-700 rounded-lg shadow-lg hover:from-green-600 hover:to-green-800 transition-all duration-300">
+                    Submit Answers
+                </button>
+            </div>
+        </div>
+        <form action="{{ url_for('career_suggestion') }}" method="GET">
+            <button type="submit">Get Career Suggestion</button>
+        </form>
+
+
     </div>
 
-    <script>
-        // Toggle skill selection
-        function toggleSkill(button) {
-            button.classList.toggle('selected');
+<script>
+    let currentQuestions = [];
+    let selectedSkills = [];
+
+    function toggleSkill(button) {
+        button.classList.toggle('selected');
+        const skill = button.textContent.trim();
+        if (selectedSkills.includes(skill)) {
+            selectedSkills = selectedSkills.filter(s => s !== skill);
+        } else {
+            selectedSkills.push(skill);
+        }
+    }
+
+    function toggleOtherSkills() {
+        const container = document.getElementById('otherSkillsContainer');
+        const arrow = document.getElementById('otherSkillsArrow');
+        container.classList.toggle('expanded');
+        arrow.classList.toggle('rotate-180');
+    }
+
+    async function submitStudentData() {
+        const fullName = document.getElementById('fullName').value.trim();
+        const studentId = document.getElementById('studentId').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const studentClass = document.getElementById('studentClass').value.trim();
+
+        if (!fullName || !studentId || !email || !studentClass) {
+            alert('Please fill all the required fields.');
+            return;
         }
 
-        // Toggle other skills visibility
-        function toggleOtherSkills() {
-            const container = document.getElementById('otherSkillsContainer');
-            const arrow = document.getElementById('otherSkillsArrow');
-            container.classList.toggle('expanded');
-            arrow.classList.toggle('rotate-180');
+        if (selectedSkills.length === 0) {
+            alert('Please select at least one skill.');
+            return;
         }
 
-        // Submit student data
-        function submitStudentData() {
-            // Get form values
-            const studentData = {
-                fullName: document.getElementById('fullName').value,
-                studentId: document.getElementById('studentId').value,
-                email: document.getElementById('email').value,
-                studentClass: document.getElementById('studentClass').value
-            };
-
-            // Get selected skills (both core and other)
-            const selectedSkills = [];
-            document.querySelectorAll('.skill-btn.selected').forEach(btn => {
-                selectedSkills.push(btn.textContent.trim());
+        try {
+            const response = await fetch('/get_questions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    skills: selectedSkills
+                })
             });
-            studentData.skills = selectedSkills;
 
-            // Validate data
-            if (!studentData.fullName || !studentData.studentId || !studentData.email || !studentData.studentClass) {
-                alert('Please fill in all required fields');
+            if (!response.ok) throw new Error('Failed to get questions');
+
+            const data = await response.json();
+            currentQuestions = data.questions;
+
+            if (currentQuestions.length === 0) {
+                alert('No questions found for the selected skills.');
                 return;
             }
 
-            if (studentData.skills.length === 0) {
-                alert('Please select at least one skill');
-                return;
-            }
-
-            // In a real app, you would send this to a server
-            console.log('Student Data:', studentData);
-            alert('Assessment submitted successfully!');
-            
-            // Here you would typically redirect or show a success message
-            // window.location.href = 'results.html';
+            displayQuestions();
+            document.getElementById('questionsSection').classList.remove('hidden');
+        } catch (err) {
+            console.error(err);
+            alert('Error loading questions. Try again later.');
         }
-    </script>
+    }
+
+    function displayQuestions() {
+        const container = document.getElementById('questionsContainer');
+        container.innerHTML = '';
+
+        currentQuestions.forEach((q, index) => {
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'bg-gray-800 p-4 rounded-lg mb-4';
+            questionDiv.innerHTML = `
+                <h4 class="font-medium mb-2">${index + 1}. ${q.question}</h4>
+                <textarea id="answer-${index}"
+                          class="w-full px-3 py-2 text-black rounded-lg"
+                          rows="3"
+                          placeholder="Your answer..."></textarea>
+                <input type="hidden" id="expected-${index}" value="${q.answer}">
+            `;
+            container.appendChild(questionDiv);
+        });
+    }
+
+    async function submitAnswers() {
+        const answers = currentQuestions.map((q, index) => ({
+            question: q.question,
+            userAnswer: document.getElementById(`answer-${index}`).value,
+            expectedAnswer: document.getElementById(`expected-${index}`).value
+        }));
+
+        try {
+            const response = await fetch('/evaluate_answers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ answers })
+            });
+
+            const result = await response.json();
+            alert(result.message || 'Answers submitted successfully!');
+        } catch (err) {
+            console.error(err);
+            alert('Failed to submit answers.');
+        }
+    }
+</script>
+
+
 </body>
 </html>
-<!-- 
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Demo</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <h1>Career Dataset Preview</h1>
-        <table border="1">
-            <tr>
-                <th>Skills</th>
-                <th>Career</th>
-            </tr>
-            {% for row in data %}
-            <tr>
-                <td>{{ row['skills'] }}</td>
-                <td>{{ row['career'] }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-        <a href="/"><button>Back to Home</button></a>
-    </div>
-</body>
-</html> -->

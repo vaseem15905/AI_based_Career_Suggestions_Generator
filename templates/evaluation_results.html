@@ -116,16 +116,6 @@
           class="w-full py-3 rounded-lg text-center bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-all"
         >
           Home
-        </a>
-          {% for career, skill_feedback in feedback.items() %}
-          <a
-                  href="{{ url_for('home') }}"
-                  class="inline-block py-3 px-6 font-semibold text-white bg-gradient-to-r from-green-500 to-green-700 rounded-lg shadow-lg hover:from-green-600 hover:to-green-800 transition-all duration-300 mb-4"
-          >
-              Generate Resume for {{ career }}
-          </a>
-          {% endfor %}
-
       </div>
     </div>
   </body>

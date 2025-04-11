@@ -38,7 +38,7 @@
                     {% for idx, question in skill_questions %}
                     <li>
                         <label>Q{{ idx + 1 }}. {{ question }}</label>
-                        <textarea name="answer_{{ skill }}_{{ idx }}" rows="2" class="w-full p-2"></textarea>
+                        <textarea name="answer_{{ skill }}_{{ idx }}" rows="2" class="w-full p-2 text-black"></textarea>
                         <input type="hidden" name="question_{{ skill }}_{{ idx }}" value="{{ question }}">
                     </li>
                     {% endfor %}

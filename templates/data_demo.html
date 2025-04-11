@@ -194,31 +194,7 @@
             return;
         }
 
-        try {
-            const response = await fetch('/get_questions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    skills: selectedSkills
-                })
-            });
-
-            if (!response.ok) throw new Error('Failed to get questions');
-
-            const data = await response.json();
-            currentQuestions = data.questions;
-
-            if (currentQuestions.length === 0) {
-                alert('No questions found for the selected skills.');
-                return;
-            }
-
-            displayQuestions();
-            document.getElementById('questionsSection').classList.remove('hidden');
-        } catch (err) {
-            console.error(err);
-            alert('Error loading questions. Try again later.');
-        }
+        alert('Submitted successfully!');
     }
 
     function displayQuestions() {

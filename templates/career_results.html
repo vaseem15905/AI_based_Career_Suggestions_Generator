@@ -28,28 +28,18 @@
 
     <!-- Skill-Based Questions Section -->
     <form action="{{ url_for('evaluate_answers') }}" method="POST" class="bg-gray-700 p-6 rounded-lg">
-        <h3 class="text-lg font-semibold mb-2">Skill-Based Questions</h3>
-
-        {% if questions %}
         {% for career, skills in questions.items() %}
-        <div class="mb-6">
+        <div>
             <h4 class="font-semibold text-xl text-blue-400">{{ career }}</h4>
             {% for skill, skill_questions in skills.items() %}
-            <div class="pt-4">
-                <p class="text-lg font-medium text-gray-300">{{ skill }}</p>
-                <ul class="mt-2 space-y-2">
+            <div>
+                <h5 class="font-medium">{{ skill }}</h5>
+                <ul>
                     {% for idx, question in skill_questions %}
                     <li>
-                        <div class="text-sm">
-                            <label class="block">{{ idx + 1 }}. {{ question }}</label>
-                            <textarea
-                                    name="answer_{{ skill }}_{{ idx }}"
-                                    rows="2"
-                                    required
-                                    class="w-full p-2 mt-1 rounded-md bg-gray-600 text-white focus:outline-none"
-                            ></textarea>
-                            <input type="hidden" name="question_{{ skill }}_{{ idx }}" value="{{ question }}">
-                        </div>
+                        <label>Q{{ idx + 1 }}. {{ question }}</label>
+                        <textarea name="answer_{{ skill }}_{{ idx }}" rows="2" class="w-full p-2"></textarea>
+                        <input type="hidden" name="question_{{ skill }}_{{ idx }}" value="{{ question }}">
                     </li>
                     {% endfor %}
                 </ul>
@@ -57,14 +47,7 @@
             {% endfor %}
         </div>
         {% endfor %}
-        <div class="text-right mt-6">
-            <button type="submit" class="py-2 px-4 bg-green-500 rounded-lg text-white hover:bg-green-600">
-                Submit Answers
-            </button>
-        </div>
-        {% else %}
-        <p class="text-gray-400">No skill-based questions available.</p>
-        {% endif %}
+        <button type="submit" class="py-2 px-4 bg-green-500 rounded-lg">Submit Answers</button>
     </form>
 
     <!-- Navigation Buttons -->

@@ -209,77 +209,91 @@ def get_questions():
 
 @app.route("/evaluate_answers", methods=["POST"])
 def evaluate_answers():
-    # If the user is not logged in
+    # Ensure the user is logged in
     if "user" not in session:
         return jsonify({"error": "Unauthorized"}), 401
 
-    # Make sure the machine learning components are loaded
+    # Check if required models/components are loaded
     if not all([model, vectorizer, label_encoder]):
         return jsonify({"error": "Model not loaded"}), 503
 
-    # Check for correct content type
-    if not request.is_json:
-        return jsonify({"error": "Unsupported Media Type. Use 'application/json'"}), 415
+    # Ensure the request is valid
+    if not request.form:
+        return jsonify({"error": "Invalid or missing data"}), 400
 
-    # Safely parse JSON from the request
-    try:
-        data = request.get_json()
-    except Exception as e:
-        return jsonify({"error": "Invalid JSON data", "details": str(e)}), 400
+    # Parse form data
+    form_data = request.form
+    answers = []
 
-    # Variables for evaluation
-    evaluations = []
-    correct = 0
+    # Collect user answers and associated questions
+    for key, value in form_data.items():
+        if key.startswith("answer_"):
+            question_id = key.replace("answer_", "")
+            expected_question_key = f"question_{question_id}"
+            if expected_question_key in form_data:
+                answers.append({
+                    "userAnswer": value,
+                    "expectedAnswer": form_data[expected_question_key],
+                    "career": "Data Scientist",  # Example placeholder
+                    "skill": "Python"  # Example placeholder
+                })
+
+    # Prepare feedback
+    feedback = {}
+    correct_count = 0
     total_similarity = 0
 
-    # Evaluate each answer submitted
-    for idx, answer in enumerate(data.get("answers", [])):
-        # Transform the user answer and the expected answer using the vectorizer
-        try:
-            vectors = vectorizer.transform([answer["userAnswer"], answer["expectedAnswer"]])
-            similarity = (vectors[0] @ vectors[1].T).toarray()[0][0]  # Cosine similarity
-        except KeyError:  # If a key is missing in the data
-            return jsonify({"error": f"Missing key in answer at index {idx}"}), 400
+    # Process user answers
+    for idx, answer in enumerate(answers):
+        # Calculate similarity score
+        vectors = vectorizer.transform([answer["userAnswer"], answer["expectedAnswer"]])
+        similarity = (vectors[0] @ vectors[1].T).toarray()[0][0]
+        is_correct = similarity > 0.7  # Threshold for correctness
 
-        # Determine whether the answer is correct based on the similarity score
-        is_correct = similarity > 0.7
-        evaluations.append({
-            "index": idx + 1,  # Q1, Q2, etc.
-            "user_answer": answer["userAnswer"],
-            "expected_answer": answer["expectedAnswer"],
-            "similarity": float(similarity),
-            "is_correct": bool(is_correct)
+        career = answer.get("career", "General")
+        skill = answer.get("skill", "Miscellaneous")
+
+        # Initialize career and skill feedback structure
+        if career not in feedback:
+            feedback[career] = {}
+        if skill not in feedback[career]:
+            feedback[career][skill] = []
+
+        # Append individual question feedback under the appropriate career and skill
+        feedback[career][skill].append({
+            "index": idx + 1,
+            "question": answer["expectedAnswer"],
+            "answer": answer["userAnswer"],
+            "is_correct": is_correct,
+            "similarity": round(similarity * 100, 2),
+            "correct_answer": answer["expectedAnswer"] if not is_correct else None
         })
 
         if is_correct:
-            correct += 1  # Increment correct counter
-        total_similarity += similarity  # Add to total similarity score
+            correct_count += 1
+        total_similarity += similarity
 
-    # Calculate average score and skill level
-    avg_score = (total_similarity / len(evaluations)) * 100 if evaluations else 0
-    skill_level = "Beginner"
-    if avg_score > 70: skill_level = "Intermediate"
-    if avg_score > 85: skill_level = "Expert"
+    # Calculate overall scores
+    total_questions = sum(
+        len(skill_feedback) for career_feedback in feedback.values() for skill_feedback in career_feedback.values())
+    avg_score = (total_similarity / total_questions) * 100 if total_questions else 0
+    skill_level = "Beginner" if avg_score <= 70 else "Intermediate" if avg_score <= 85 else "Expert"
 
-    # Save results in session for the current user
-    if session["user"] not in student_data:
-        student_data[session["user"]] = {}
-
+    # Save evaluation data in session
     student_data[session["user"]]["results"] = {
         "score": avg_score,
         "skill_level": skill_level,
-        "correct": correct,
-        "total": len(evaluations)
+        "correct": correct_count,
+        "total": total_questions
     }
 
-    # Return JSON data as a response
-    return jsonify({
-        "evaluations": evaluations,
-        "correct_count": correct,
-        "total_questions": len(evaluations),
-        "average_score": avg_score,
-        "skill_level": skill_level
-    })
+    # Render the evaluation results page with feedback
+    return render_template(
+        "evaluation_results.html",
+        feedback=feedback,
+        total_score=avg_score,
+    )
+
 
 
 

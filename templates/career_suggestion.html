@@ -46,19 +46,13 @@
 
         <!-- Career Suggestion Form -->
         <form method="POST" action="{{ url_for('career_suggestion') }}" class="space-y-4">
-            <div>
-                <label for="skills" class="block text-sm font-medium">Your Skills and Interests</label>
-                <textarea id="skills" name="skills" required rows="4"
-                    class="w-full px-4 py-2 mt-1 text-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none hover:bg-gray-700 transition duration-200 skill-input"
-                    placeholder="Example: Python programming, data analysis, machine learning, problem solving...">{{ request.form.skills if request.form.skills }}</textarea>
-            </div>
-
-            <div class="flex justify-between pt-2">
-                <button type="submit"
-                        class="py-2 px-6 font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-800 transition-all duration-300">
-                    Get Career Suggestion
-                </button>
-            </div>
+    <textarea id="skills" name="skills" required rows="4"
+              class="w-full px-4 py-2 mt-1 text-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              placeholder="Example: Python programming, data analysis, machine learning, problem solving...">
+        {{ request.form.skills if request.form.skills }}</textarea>
+            <button type="submit" class="py-2 px-6 font-semibold text-white bg-blue-500 rounded-lg shadow-lg">
+                Get Career Suggestion
+            </button>
         </form>
 
         <!-- Career Suggestion Result -->
